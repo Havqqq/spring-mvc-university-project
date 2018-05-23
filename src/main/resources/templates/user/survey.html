@@ -17,16 +17,13 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
             integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
             crossorigin="anonymous"></script>
+    <script type="text/javascript">
+    function sliderChange(value, id) {
+            document.getElementById('slider'+id).innerHTML = value;
+        }
+    </script>
 </head>
 <body>
-<div id="fb-root"></div>
-<script>(function(d, s, id) {
-  var js, fjs = d.getElementsByTagName(s)[0];
-  if (d.getElementById(id)) return;
-  js = d.createElement(s); js.id = id;
-  js.src = 'https://connect.facebook.net/pl_PL/sdk.js#xfbml=1&version=v3.0';
-  fjs.parentNode.insertBefore(js, fjs);
-}(document, 'script', 'facebook-jssdk'));</script>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark" th:fragment="header">
     <div class="container">
         <a class="navbar-brand" href="#">Kierunki PRZ</a>
@@ -44,7 +41,6 @@
                         <a class="nav-link" th:href="@{/user/home}">Twoja lista</a>
                     </div>
                 </li>
-
             </ul>
             <div sec:authorize="isAnonymous()">
                 <a th:href="@{/login}" class="btn btn-outline-success" role="button" aria-pressed="true">Logowanie</a>
@@ -60,29 +56,44 @@
         </div>
     </div>
 </nav>
-<div class="container mt-4">
-<div class="row">
-<div class="col-md-8">
-<div class="card-columns">
-    <div class="card" th:each="faculty : ${faculties}">
 
-            <img  class="card-img-top" th:attr="src=${faculty.logo}" alt="Card image cap" border="10">
-            <div class="card-body">
-                <h5 class="card-title" th:text="${faculty.name}">Card title</h5>
-                <h6 class="card-subtitle" th:text="${faculty.address}"></h6>
-                <br>
-                <h6 class="card-subtitle2">Kierunki:</h6>
-                <div th:each="spec : ${specs}">
-                    <p th:text="(${spec.faculty.id} eq ${faculty.id}) ? ('    ' + ${spec.name})"></p>
-                </div>
-                <a th:attr="href=${faculty.website}" class="btn btn-primary">Strona wydzialu</a>
-            </div>
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Wypełnij ankietę:</h2>
+
+            <form action="#" th:action="@{/user/survey}" th:object="${wrapper}" method="post">
+                <table class="table">
+                    <tbody>
+                    <tr th:each="answer, rowStat : ${wrapper.answerList}">
+                        <td><p th:text="${answer.question.question}"></p></td>
+                        <td><input type="hidden"
+                                   th:field="*{answerList[__${rowStat.index}__].id}"
+                                   th:value="*{answerList[__${rowStat.index}__].getId()}"
+                                   readonly="readonly"/>
+                        </td>
+                        <td><input type="hidden"
+                                   th:field="*{answerList[__${rowStat.index}__].user.id}"
+                                   th:value="*{answerList[__${rowStat.index}__].getUser().getId()}"
+                                   readonly="readonly"/>
+                        </td>
+                        <td><input type="hidden"
+                                   th:field="*{answerList[__${rowStat.index}__].question.id}"
+                                   th:value="*{answerList[__${rowStat.index}__].getQuestion().getId()}"
+                                   readonly="readonly"/>
+                        </td>
+                        <td align="center">0<input type="range" min="0" max="10" value="5" th:attr="id='Status' + ${rowStat.count}" onchange="sliderChange(this.value, this.id)"
+                                   th:field="*{answerList[__${rowStat.index}__].value}"
+                                   th:value="*{answerList[__${rowStat.index}__].getValue()}"/>10 <br /> <span th:attr="id='sliderStatus' + ${rowStat.count}">0</span>
+
+                        </td>
+                        </tr>
+                        </tbody>
+                </table>
+                <button type="submit" class="btn btn-success btn-lg btn-block mb-3">Zapisz ankietę</button>
+            </form>
+        </div>
     </div>
-</div>
-</div>
-<div class="col-md-4">
-    <div class="fb-page" data-href="https://www.facebook.com/oficjalnypolitechnikarzeszowska/" data-tabs="timeline" data-small-header="false" data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="true"><blockquote cite="https://www.facebook.com/oficjalnypolitechnikarzeszowska/" class="fb-xfbml-parse-ignore"><a href="https://www.facebook.com/oficjalnypolitechnikarzeszowska/">Politechnika Rzeszowska im. I. Łukasiewicza</a></blockquote></div></div>
-</div>
 </div>
 </body>
 </html>
